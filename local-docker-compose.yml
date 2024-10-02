@@ -1,0 +1,16 @@
+services:
+  web:
+    container_name: web
+    image: web
+    build: 
+       context: .
+       dockerfile: ./docker/local/django/Dockerfile
+
+    restart: always
+    volumes:
+      - ./core:/app
+
+    command: /start.sh  
+
+    ports:
+      - "8000:8000"
