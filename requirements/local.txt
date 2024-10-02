@@ -1,1 +1,8 @@
 -r base.txt
+
+
+# Code formatting and linting tools
+black==24.8.0
+flake8==7.1.1
+isort==5.13.2
+

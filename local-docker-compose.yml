@@ -10,7 +10,8 @@ services:
     restart: always
     volumes:
       - ./core:/app
-
+      - static_volume:/app/static
+      - media_volume:/app/media
     command: /start.sh  
 
     env_file:
@@ -38,5 +39,7 @@ services:
 volumes:
   local_postgres_data:
   local_postgres_backup:
+  static_volume:
+  media_volume:
 
 
