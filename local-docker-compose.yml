@@ -22,6 +22,8 @@ services:
 
     depends_on:
       - db
+      - redis
+      - rabbitmq
 
   db:
     container_name: db
@@ -34,6 +36,30 @@ services:
       - local_postgres_backup:/backups         
     env_file:
       - envs/local/postgres.env
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+        - "8888:80"
+    depends_on:
+      - db    
+
+  redis:
+    container_name: 'redis'
+    image: 'redis'
+    restart: always
+
+  rabbitmq:
+     container_name: 'rabbitmq'
+     image: 'rabbitmq:management'
+     restart: always
+     ports:
+       - '5672:5672'
+       - '15672:15672'    
 
 
 volumes:
