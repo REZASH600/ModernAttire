@@ -51,3 +51,15 @@ restore:
 	# To use this target, specify the BACKUP_FILE variable like this:
 	# make restore BACKUP_FILE=your_backup_file.sql.gz
 	docker exec db restore.sh $(BACKUP_FILE)
+
+flake8:
+	# Run flake8 for linting the Python code in the core directory
+	flake8 --config=./core/setup.cfg ./core
+
+black:
+	# Run black to format the Python code in the core directory
+	black ./core
+
+isort:
+	# Run isort to sort imports in the Python code in the core directory
+	isort --settings-path=./core/setup.cfg ./core
