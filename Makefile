@@ -28,12 +28,26 @@ web-shell:
 
 makemigrations:
 	# Create new database migrations based on the current models
-	docker exec -it web python manage.py makemigrations
+	docker exec web python manage.py makemigrations
 
 migrate:
 	# Apply database migrations
-	docker exec -it web python manage.py migrate
+	docker exec web python manage.py migrate
 	
 createsuperuser:
 	# Create a superuser for the Django application
 	docker exec -it web python manage.py createsuperuser
+
+backup:
+	# Execute the backup script in the db container
+	docker exec db backup.sh
+
+backups:
+	# Execute the backups script in the db container
+	docker exec db backups.sh
+
+restore:
+	# Restore the database from the specified backup file
+	# To use this target, specify the BACKUP_FILE variable like this:
+	# make restore BACKUP_FILE=your_backup_file.sql.gz
+	docker exec db restore.sh $(BACKUP_FILE)
