@@ -1,4 +1,5 @@
 services:
+  
   web:
     container_name: web
     image: web
@@ -12,5 +13,30 @@ services:
 
     command: /start.sh  
 
+    env_file:
+      - ./envs/local/django.env
+      - ./envs/local/postgres.env
     ports:
       - "8000:8000"
+
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    build:
+       context: .
+       dockerfile: ./docker/local/postgres/Dockerfile
+
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_backup:/backups         
+    env_file:
+      - envs/local/postgres.env
+
+
+volumes:
+  local_postgres_data:
+  local_postgres_backup:
+
+
