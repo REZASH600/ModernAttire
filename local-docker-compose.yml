@@ -59,7 +59,43 @@ services:
      restart: always
      ports:
        - '5672:5672'
-       - '15672:15672'    
+       - '15672:15672'
+
+  
+  celery:
+    container_name: celery
+    image: celery
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+
+    restart: always
+    volumes:
+      - ./core:/app
+    command: >
+      sh -c "celery -A config worker -l INFO -Q tasks,dead_letter"
+
+    env_file:
+      - ./envs/local/django.env
+      - ./envs/local/postgres.env  
+
+    depends_on:
+      - redis
+      - rabbitmq
+      - web 
+      
+  flower:
+    container_name: flower
+    image: mher/flower
+    ports:
+      - "5555:5555"
+    env_file:
+      - ./envs/local/django.env
+
+
+    restart: always
+    depends_on:
+      - rabbitmq            
 
 
 volumes:
