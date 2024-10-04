@@ -22,3 +22,4 @@ celery==5.3.4
 # drf
 djangorestframework==3.14.0
 django-filter==24.3
+djangorestframework-simplejwt==5.3.1
