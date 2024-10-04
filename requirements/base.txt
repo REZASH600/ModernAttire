@@ -16,3 +16,9 @@ redis==5.0.8
 
 # Add Celery for background task management
 celery==5.3.4
+
+
+
+# drf
+djangorestframework==3.14.0
+django-filter==24.3

@@ -40,7 +40,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "apps.accounts.apps.AccountsConfig"
+    
+    # app
+    "apps.accounts.apps.AccountsConfig",
+
+    # drf
+    "rest_framework",
+    "django_filters",
 ]
 
 MIDDLEWARE = [
@@ -138,12 +144,12 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-
 # Celery settings
-CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="amqp://guest:guest@rabbitmq:5672/")
+CELERY_BROKER_URL = config(
+    "CELERY_BROKER_URL", default="amqp://guest:guest@rabbitmq:5672/"
+)
 CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://redis:6379/0")
 
 
 # accounts model settings
 AUTH_USER_MODEL = "accounts.User"
-
