@@ -1,6 +1,7 @@
+import os
+
 from celery import Celery
 from kombu import Exchange, Queue
-import os
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 app = Celery("config")
