@@ -1,8 +1,9 @@
 from django.db import models
 
+from django.contrib.auth import password_validation
 from django.contrib.auth.models import (
-    BaseUserManager,
     AbstractBaseUser,
+    BaseUserManager,
     PermissionsMixin,
 )
 from . import validations
@@ -99,7 +100,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.phone
-    
 
     def clean(self):
         """
@@ -116,8 +116,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             if User.objects.filter(email=email).exclude(pk=self.pk).exists():
                 raise ValidationError(_("This email is already in use."))
         super().clean()
-
-
 
     @property
     def is_staff(self):
