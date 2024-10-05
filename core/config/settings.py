@@ -157,6 +157,7 @@ AUTH_USER_MODEL = "accounts.User"
 
 # drf
 REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
@@ -166,8 +167,8 @@ REST_FRAMEWORK = {
 # JWT
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=6),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7)
-    }
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+}
 
 # spectacular
 SPECTACULAR_SETTINGS = {
