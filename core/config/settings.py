@@ -41,12 +41,17 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     # app
     "apps.accounts.apps.AccountsConfig",
+    
     # drf
     "rest_framework",
     "django_filters",
     "drf_spectacular",
+
+    # package
+    "widget_tweaks",
 ]
 
 MIDDLEWARE = [
