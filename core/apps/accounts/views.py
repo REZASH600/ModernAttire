@@ -1,7 +1,8 @@
+from django.forms.forms import BaseForm
 from django.shortcuts import redirect
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, authenticate
 from . import forms
 from django.contrib import messages
 from django.urls import reverse_lazy
@@ -25,3 +26,24 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         messages.success(self.request, "Profile updated successfully!")
 
         return redirect(self.success_url)
+
+
+class LoginView(FormView):
+    template_name = "accounts/login.html"
+    form_class = forms.LoginForm
+    success_url = reverse_lazy("accounts:profile")
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("/")
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        cd = form.cleaned_data
+        user = authenticate(username=cd["identifier"], password=cd["password"])
+        if user is None:
+            form.add_error(None, "Invalid username or password.")
+            return self.form_invalid(form)
+        login(self.request, user)
+        next_page = self.request.GET.get("next")
+        return redirect(next_page) if next_page else super().form_valid(form)
