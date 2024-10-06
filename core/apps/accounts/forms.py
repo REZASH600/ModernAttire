@@ -1,8 +1,10 @@
 from django import forms
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, authenticate
 from django.core.exceptions import ValidationError
 from django.contrib.auth import password_validation
+from django.core.validators import validate_email
 from django.contrib.auth import update_session_auth_hash
+from . import validations
 
 User = get_user_model()
 
@@ -68,3 +70,32 @@ class ProfileForm(forms.ModelForm):
                 update_session_auth_hash(request, user)
 
         return user
+
+
+class LoginForm(forms.Form):
+    identifier = forms.CharField(
+        max_length=255, widget=forms.TextInput({"placeholder": "phone or email"})
+    )
+    password = forms.CharField(widget=forms.PasswordInput({"placeholder": "password"}))
+
+    def clean_identifier(self):
+        identifier = self.cleaned_data.get("identifier")
+
+        if not identifier:
+            raise ValidationError(
+                "Identifier must be a valid phone number or email address."
+            )
+
+        elif identifier.isdigit():
+            try:
+                validations.validate_phone(identifier)
+            except ValidationError as e:
+                raise ValidationError(e.messages)
+
+        elif "@" in identifier:
+            try:
+                validate_email(identifier)
+            except ValidationError as e:
+                raise ValidationError(e.messages)
+
+        return identifier
