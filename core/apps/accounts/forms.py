@@ -1,9 +1,12 @@
 from django import forms
-from django.contrib.auth import get_user_model, login, authenticate
+from django.contrib.auth import (
+    get_user_model,
+    password_validation,
+    update_session_auth_hash,
+)
 from django.core.exceptions import ValidationError
-from django.contrib.auth import password_validation
 from django.core.validators import validate_email
-from django.contrib.auth import update_session_auth_hash
+
 from . import validations
 
 User = get_user_model()
@@ -54,7 +57,7 @@ class ProfileForm(forms.ModelForm):
             except ValidationError as e:
                 raise ValidationError(e.messages)
 
-        return super().clean()    
+        return super().clean()
 
     def save(self, commit=True, request=None):
         user = super().save(commit=False)

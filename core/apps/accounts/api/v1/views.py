@@ -1,12 +1,13 @@
-from rest_framework.viewsets import ModelViewSet
-from . import serializers
-from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.parsers import MultiPartParser
-from rest_framework.permissions import IsAdminUser
-from .pagination import StandardResultsSetPagination
+from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
-from django.contrib.auth import get_user_model
+from rest_framework.parsers import MultiPartParser
+from rest_framework.permissions import IsAdminUser
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from . import serializers
+from .pagination import StandardResultsSetPagination
 
 User = get_user_model()
 
