@@ -7,4 +7,5 @@ urlpatterns = [
     path("api/v1/", include("apps.accounts.api.v1.urls")),
     path("profile/", views.ProfileView.as_view(), name="profile"),
     path("login/", views.LoginView.as_view(), name="login"),
+    path("logout/", views.LogoutView.as_view(), name="logout"),
 ]
