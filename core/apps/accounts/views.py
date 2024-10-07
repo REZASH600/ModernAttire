@@ -2,7 +2,7 @@ from django.forms.forms import BaseForm
 from django.shortcuts import redirect
 from django.views.generic.edit import UpdateView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import get_user_model, login, authenticate
+from django.contrib.auth import get_user_model, authenticate
 from . import forms
 from django.contrib import messages
 from django.urls import reverse_lazy
