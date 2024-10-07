@@ -1,15 +1,14 @@
-from django.db import models
-
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
     PermissionsMixin,
 )
-from . import validations
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import password_validation
+
+from . import validations
 
 
 class MyUserManager(BaseUserManager):

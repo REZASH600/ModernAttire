@@ -1,12 +1,12 @@
-from django.forms.forms import BaseForm
-from django.shortcuts import redirect
-from django.views.generic.edit import UpdateView, FormView
-from django.views import View
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import get_user_model, authenticate,logout, login
-from . import forms
 from django.contrib import messages
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.views import View
+from django.views.generic.edit import FormView, UpdateView
+
+from . import forms
 
 User = get_user_model()
 
@@ -45,16 +45,14 @@ class LoginView(FormView):
         if user is None:
             form.add_error(None, "Invalid username or password.")
             return self.form_invalid(form)
-        
+
         login(self.request, user)
         next_page = self.request.GET.get("next")
         return redirect(next_page) if next_page else super().form_valid(form)
 
 
-
 class LogoutView(View):
-    
+
     def get(self, request):
         logout(request)
         return redirect("/")
-
