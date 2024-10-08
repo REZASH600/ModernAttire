@@ -30,7 +30,7 @@ class UserAdmin(BaseUserAdmin):
         (
             "Permissions",
             {
-                "fields": ("is_active", "is_superuser"),
+                "fields": ("is_active", "is_superuser", "is_verify"),
             },
         ),
         (
@@ -60,6 +60,7 @@ class UserAdmin(BaseUserAdmin):
                     "password2",
                     "is_active",
                     "is_superuser",
+                    "is_verify",
                 ),
             },
         ),
