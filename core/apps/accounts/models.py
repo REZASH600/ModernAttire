@@ -6,9 +6,15 @@ from django.contrib.auth.models import (
 )
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from . import validations
+
+from datetime import timedelta
+from django.utils import timezone
+from django.conf import settings
+import random
 
 
 class MyUserManager(BaseUserManager):
@@ -126,3 +132,61 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = _("User")
         verbose_name_plural = _("Users")
+
+
+class Otp(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, verbose_name=_("user"), related_name="otp"
+    )
+    code = models.CharField(_("code"), max_length=6)
+
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    expires_at = models.DateTimeField(_("expires at"))
+
+    def save(self, *args, **kwargs):
+
+        if not self.expires_at:
+            expiration_minutes = getattr(settings, "OTP_EXPIRATION_TIME", 5)
+            self.expires_at = timezone.now() + timedelta(minutes=expiration_minutes)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    @classmethod
+    def get_active_otp(cls, user_id, code=None):
+        """
+        Retrieve the active OTP for a specified user.
+
+        Parameters:
+            user_id (int): The ID of the user.
+            code (str, optional): The specific OTP code to match.
+
+        Returns:
+            Otp or None: The active OTP instance if found and not expired; otherwise, None.
+        """
+
+        otp = Otp.objects.filter(
+            Q(user_id=user_id) & (Q(code=code) if code else Q())
+        ).first()
+        if otp:
+            if not otp.is_expired:
+                return otp
+
+        return None
+    
+    @classmethod
+    def create_otp_for_user(cls,user_id):
+        """Create an OTP for a specific user."""
+        
+        code = random.randint(100000,999999)
+        return Otp.objects.create(user_id=user_id,code=code)
+
+    def __str__(self):
+        return f"OTP for {self.user}: {self.code} (Expires at: {self.expires_at})"
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = _("One Time Password")
+        verbose_name_plural = _("One Time Passwords")
