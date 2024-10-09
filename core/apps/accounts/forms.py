@@ -102,3 +102,45 @@ class LoginForm(forms.Form):
                 raise ValidationError(e.messages)
 
         return identifier
+
+
+
+class RegisterForm(forms.ModelForm):
+
+    new_password = forms.CharField(
+        max_length=128, widget=forms.PasswordInput()
+    )
+    confirm_password = forms.CharField(
+        max_length=128, widget=forms.PasswordInput()
+    )
+
+    class Meta:
+        model = User
+        fields = ["phone", "username"]
+
+    def clean(self):
+        new_password = self.cleaned_data.get("new_password")
+        confirm_password = self.cleaned_data.get("confirm_password")
+        user = self.instance
+
+        if new_password and new_password != confirm_password:
+            raise ValidationError("The new passwords do not match.")
+
+        try:
+            password_validation.validate_password(new_password, user=user)
+        except ValidationError as e:
+            raise ValidationError(e.messages)
+        return super().clean()
+
+
+
+class CheckOtpForm(forms.Form):
+    code = forms.CharField(
+        max_length=6, widget=forms.TextInput({"placeholder": "code"})
+    )
+
+    def clean_random_code(self):
+        code = self.cleaned_data.get("code")
+        if len(code) != 6 or not code.isdigit():
+            raise ValidationError("Please enter the correct code")
+        return code
