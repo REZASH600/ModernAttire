@@ -1,0 +1,109 @@
+{% load static %}
+{% load widget_tweaks %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Register</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- =============================================================================================== -->
+    <link rel="icon" type="image/png" href="{% static 'accounts/images/icons/favicon.ico' %}" />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/vendor/bootstrap/css/bootstrap.min.css' %}" />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %} " />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/fonts/iconic/css/material-design-iconic-font.min.css' %} " />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/vendor/animate/animate.css' %} " />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/vendor/css-hamburgers/hamburgers.min.css' %} " />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/vendor/animsition/css/animsition.min.css' %} " />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/vendor/select2/select2.min.css' %} " />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/vendor/daterangepicker/daterangepicker.css' %} " />
+    <!-- =============================================================================================== -->
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/util.css' %} " />
+    <link rel="stylesheet" type="text/css" href="{% static 'accounts/css/main.css' %} " />
+    <!-- =============================================================================================== -->
+  </head>
+  <body>
+    <div class="limiter">
+      <div class="container-login100" style="background-image: url('{% static 'accounts/images/bg-01.jpg' %}');">
+        <div class="wrap-login100">
+          <form class="login100-form validate-form" method="post">
+            {% csrf_token %}
+
+            <span class="login100-form-logo"><i class="zmdi zmdi-landscape"></i></span>
+
+            <span class="login100-form-title p-b-34 p-t-27">Register</span>
+
+            <div class="wrap-input100">
+                {{ form.phone|attr:'class:input100' | attr:'placeholder:phone' }}
+                <span class="focus-input100" data-placeholder="&#xf207;"></span>
+                {% for error in form.phone.errors %}
+                  <p style="color: black">{{ error }}</p>
+                {% endfor %}
+            </div>
+  
+
+
+            <div class="wrap-input100">
+              {{ form.username|attr:'class:input100' | attr:'placeholder:username' }}
+              <span class="focus-input100" data-placeholder="&#xf207;"></span>
+              {% for error in form.username.errors %}
+                <p style="color: black">{{ error }}</p>
+              {% endfor %}
+            </div>
+
+
+            <div class="wrap-input100">
+                {{ form.new_password|attr:'class:input100' | attr:'placeholder: new password'}}
+                <span class="focus-input100" data-placeholder="&#xf207;"></span>
+                {% for error in form.new_password.errors %}
+                  <p style="color: black">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+
+            <div class="wrap-input100">
+                {{ form.confirm_password|attr:'class:input100' | attr:'placeholder:confirm password' }}
+                <span class="focus-input100" data-placeholder="&#xf207;"></span>
+                {% for error in form.confirm_password.errors %}
+                  <p style="color: black">{{ error }}</p>
+                {% endfor %}
+            </div>
+  
+  
+
+            <div class="container-login100-form-btn">
+              <button class="login100-form-btn" type="submit">Verify Phone</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="dropDownSelect1"></div>
+
+    <!-- =============================================================================================== -->
+    <script src="{% static 'accounts/vendor/jquery/jquery-3.2.1.min.js' %} "></script>
+    <!-- =============================================================================================== -->
+    <script src="{% static 'accounts/vendor/animsition/js/animsition.min.js' %} "></script>
+    <!-- =============================================================================================== -->
+    <script src="{% static 'accounts/vendor/bootstrap/js/popper.js' %} "></script>
+    <script src="{% static 'accounts/vendor/bootstrap/js/bootstrap.min.js' %} "></script>
+    <!-- =============================================================================================== -->
+    <script src="{% static 'accounts/vendor/select2/select2.min.js' %} "></script>
+    <!-- =============================================================================================== -->
+    <script src="{% static 'accounts/vendor/daterangepicker/moment.min.js' %}"></script>
+    <script src="{% static 'accounts/vendor/daterangepicker/daterangepicker.js' %}"></script>
+    <!-- =============================================================================================== -->
+    <script src="{% static 'accounts/vendor/countdowntime/countdowntime.js' %} "></script>
+    <!-- =============================================================================================== -->
+    <script src="{% static 'accounts/js/main.js' %} "></script>
+  </body>
+</html>
