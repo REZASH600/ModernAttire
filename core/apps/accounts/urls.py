@@ -11,4 +11,8 @@ urlpatterns = [
     path("logout/", views.LogoutView.as_view(), name="logout"),
     path("register/", views.RegisterView.as_view(), name="register"),
     path("register/verify/otp/<int:user_id>/", views.VerifyRegistrationOtp.as_view(), name="verify_register_otp"),
+    path("password/forgot/", views.ForgotPasswordView.as_view(), name="forgot_password"),
+    path("password/verify/otp/<int:user_id>/", views.VerifyForgotPasswordOtp.as_view(), name="verify_forgot_password_otp"),
+    path("password/reset/<str:token>/", views.ResetPasswordView.as_view(), name="reset_password"),
+
 ]
