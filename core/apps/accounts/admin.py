@@ -68,3 +68,4 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(models.Otp)
+admin.site.register(models.ResetPassword)

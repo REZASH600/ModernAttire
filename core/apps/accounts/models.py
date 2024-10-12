@@ -96,7 +96,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(_("is active"), default=True)
     is_superuser = models.BooleanField(_("is superuser"), default=False)
     is_verify = models.BooleanField(_("is verify"), default=False)
-    
+
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
 
@@ -175,13 +175,13 @@ class Otp(models.Model):
                 return otp
 
         return None
-    
+
     @classmethod
-    def create_otp_for_user(cls,user_id):
+    def create_otp_for_user(cls, user_id):
         """Create an OTP for a specific user."""
-        
-        code = random.randint(100000,999999)
-        return Otp.objects.create(user_id=user_id,code=code)
+
+        code = random.randint(100000, 999999)
+        return Otp.objects.create(user_id=user_id, code=code)
 
     def __str__(self):
         return f"OTP for {self.user}: {self.code} (Expires at: {self.expires_at})"
@@ -190,3 +190,27 @@ class Otp(models.Model):
         ordering = ("-created_at",)
         verbose_name = _("One Time Password")
         verbose_name_plural = _("One Time Passwords")
+
+
+class ResetPassword(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name=_("user"),
+        related_name="reset_password",
+    )
+
+    token = models.CharField(_("token"), max_length=64, unique=True)
+    created_at = models.DateTimeField(_("created at"), auto_now_add=True)
+    expires_at = models.DateTimeField(_("expires at"))
+
+    def save(self, *args, **kwargs):
+
+        if not self.expires_at:
+            expiration_minutes = getattr(settings, "RESET_PASSWORD_EXPIRATION_TIME", 5)
+            self.expires_at = timezone.now() + timedelta(minutes=expiration_minutes)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
