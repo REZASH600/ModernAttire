@@ -1,13 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
-from django.urls import reverse_lazy,reverse
+from django.db.models import Q
+from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse_lazy, reverse
 from django.views import View
 from django.views.generic.edit import FormView, UpdateView
 from . import models
 from . import forms
 from . import tasks
+import uuid
+from django.http import Http404
 
 User = get_user_model()
 
@@ -98,10 +101,8 @@ class VerifyRegistrationOtp(LoginRequiredMixin, View):
         user = self.request.user
         if otp is None:
             otp = models.Otp.create_otp_for_user(user_id)
-            tasks.send_otp_sms.apply_async(
-                args=[user.username, user.phone, otp.code]
-            )
-            
+            tasks.send_otp_sms.apply_async(args=[user.username, user.phone, otp.code])
+
         return render(request, "accounts/check-otp.html", {"form": form})
 
     def post(self, request, user_id):
@@ -120,3 +121,98 @@ class VerifyRegistrationOtp(LoginRequiredMixin, View):
             form.add_error("code", "The OTP has expired. Please request a new one.")
 
         return render(request, "accounts/check-otp.html", {"form": form})
+
+
+class ForgotPasswordView(View):
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect("/")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        form = forms.ForgotPasswordForm()
+        return render(request, "accounts/forgot-password.html", {"form": form})
+
+    def post(self, request):
+        form = forms.ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            identifier = form.cleaned_data["identifier"]
+            try:
+                user = User.objects.get(Q(phone=identifier) | Q(email=identifier))
+                self.request.session["otp_identifier"] = identifier
+                return redirect("accounts:verify_forgot_password_otp", user_id=user.id)
+
+            except User.DoesNotExist:
+                form.add_error(
+                    "identifier", "No account found with this phone number or email."
+                )
+
+        return render(request, "accounts/forgot-password.html", {"form": form})
+
+
+class VerifyForgotPasswordOtp(View):
+    def dispatch(self, request, user_id, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect("/")
+
+        identifier = self.request.session.get("otp_identifier")
+        if not identifier:
+            return redirect("accounts:forgot_password")
+
+        self.username = get_object_or_404(
+            User, Q(id=user_id) & (Q(email=identifier) | Q(phone=identifier))
+        ).username
+
+        return super().dispatch(request, user_id, *args, **kwargs)
+
+    def get(self, request, user_id):
+        form = forms.CheckOtpForm()
+        otp = models.Otp.get_active_otp(user_id)
+        identifier = self.request.session.get("otp_identifier")
+        if not otp:
+            otp = models.Otp.create_otp_for_user(user_id)
+
+            if "@" in identifier:
+                tasks.send_otp_email.apply_async(args=[self.username, identifier, otp.code])
+            else:
+                tasks.send_otp_sms.apply_async(args=[self.username, identifier, otp.code])
+
+        return render(request, "accounts/check-otp.html", {"form": form})
+
+    def post(self, request, user_id):
+        form = forms.CheckOtpForm(request.POST)
+        if form.is_valid():
+            otp = models.Otp.get_active_otp(user_id, form.cleaned_data["code"])
+            if otp:
+                token = str(uuid.uuid4())
+                models.ResetPassword.objects.create(token=token, user_id=user_id)
+                return redirect("accounts:reset_password", token=token)
+
+            form.add_error("code", "The verification code has expired.")
+
+        return render(request, "accounts/check-otp.html", {"form": form})
+
+
+class ResetPasswordView(View):
+    def dispatch(self, request, token, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return redirect("accounts:profile")
+        reset_password_request = get_object_or_404(models.ResetPassword, token=token)
+        if reset_password_request.is_expired:
+            raise Http404("The password reset link has expired.")
+
+        self.reset_password_request = reset_password_request
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        form = forms.ResetPasswordForm()
+        return render(request, "accounts/reset-password.html", {"form": form})
+
+    def post(self, request):
+        form = forms.ResetPasswordForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get(id=self.reset_password_request.user.id)
+            user.set_password(form.cleaned_data["new_password"])
+            self.reset_password_request.delete()
+            user.save()
+            return redirect("accounts:login")
