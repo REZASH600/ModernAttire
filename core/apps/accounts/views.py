@@ -11,6 +11,7 @@ from . import forms
 from . import tasks
 import uuid
 from django.http import Http404
+from .mixins import RedirectIfAuthenticatedMixin
 
 User = get_user_model()
 
@@ -33,15 +34,10 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         return redirect(self.success_url)
 
 
-class LoginView(FormView):
+class LoginView(RedirectIfAuthenticatedMixin, FormView):
     template_name = "accounts/login.html"
     form_class = forms.LoginForm
     success_url = reverse_lazy("accounts:profile")
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect("/")
-        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         cd = form.cleaned_data
@@ -62,12 +58,7 @@ class LogoutView(View):
         return redirect("/")
 
 
-class RegisterView(View):
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect("/")
-        return super().dispatch(request, *args, **kwargs)
+class RegisterView(RedirectIfAuthenticatedMixin, View):
 
     def get(self, request):
         form = forms.RegisterForm()
@@ -123,11 +114,7 @@ class VerifyRegistrationOtp(LoginRequiredMixin, View):
         return render(request, "accounts/check-otp.html", {"form": form})
 
 
-class ForgotPasswordView(View):
-    def dispatch(self, request, *args, **kwargs):
-        if self.request.user.is_authenticated:
-            return redirect("/")
-        return super().dispatch(request, *args, **kwargs)
+class ForgotPasswordView(RedirectIfAuthenticatedMixin, View):
 
     def get(self, request):
         form = forms.ForgotPasswordForm()
