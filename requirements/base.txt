@@ -11,7 +11,7 @@ pillow==10.4.0
 django-widget-tweaks==1.5.0
 kavenegar==1.1.2
 django-mail-templated==2.6.5
-
+django-autoslug==1.9.9
 
 # PostgreSQL, RabbitMQ, Redis integrations
 psycopg2-binary==2.9.9
