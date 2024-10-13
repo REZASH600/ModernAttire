@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # app
     "apps.accounts.apps.AccountsConfig",
+    "apps.products.apps.ProductsConfig",
     # drf
     "rest_framework",
     "django_filters",
