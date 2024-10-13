@@ -33,6 +33,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     # app
     path("accounts/", include("apps.accounts.urls")),
+    path("products/",include("apps.products.urls")),
     # jwt
     path("jwt/create/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("jwt/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
