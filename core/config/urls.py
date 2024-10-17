@@ -29,11 +29,14 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
+from apps.products.views import HomeView
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     # app
+    path("", HomeView.as_view(), name="home"),
     path("accounts/", include("apps.accounts.urls")),
-    path("products/",include("apps.products.urls")),
+    path("products/", include("apps.products.urls")),
     # jwt
     path("jwt/create/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("jwt/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
