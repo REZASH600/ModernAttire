@@ -7,3 +7,6 @@ class OrdersConfig(AppConfig):
     name = "apps.orders"
     verbose_name = _("Order")
     verbose_name_plural = _("Orders")
+
+    def ready(self):
+         from . import signals
