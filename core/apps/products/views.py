@@ -1,10 +1,12 @@
-from django.shortcuts import render, get_object_or_404, reverse
-from django.views.generic import TemplateView, ListView
+from django.shortcuts import render, get_object_or_404, reverse, redirect
+from django.views.generic import TemplateView, ListView, DetailView
 from django.views import View
 
 from . import models, modules
 from django.db.models import Count
 from django.http import JsonResponse, Http404
+from . import forms
+from apps.orders.models import OrderItem
 
 
 class HomeView(TemplateView):
@@ -60,8 +62,6 @@ class LikeView(View):
 class ProductListView(ListView):
     paginate_by = 5
 
-
-
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         paginator = self.get_paginator(queryset, self.get_paginate_by(queryset))
@@ -81,10 +81,12 @@ class ProductListView(ListView):
 
                 product_json = {
                     "imageUrl": product.images.all().first().image_file.url,
-                    "redirectUrl": reverse("products:list"), # change to product detail
+                    "redirectUrl": reverse("products:list"),  # change to product detail
                     "name": product.name,
                     "price": product.price,
-                    "bestDiscountedPrice": offer.apply_discount(product) if offer else product.price ,
+                    "bestDiscountedPrice": (
+                        offer.apply_discount(product) if offer else product.price
+                    ),
                     "isLiked": is_liked,
                     "urlLike": reverse(
                         "products:like", kwargs={"product_id": product.id}
@@ -134,3 +136,66 @@ class ProductListView(ListView):
     def get_paginate_by(self, queryset):
         per_page = self.request.GET.get("per_page", self.paginate_by)
         return int(per_page)
+
+
+class ProductDetailView(DetailView):
+
+    queryset = models.Product.objects.filter(is_publish=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        product = get_object_or_404(models.Product, slug=self.kwargs["slug"])
+
+        categories = product.category.filter(is_publish=True)
+
+        related_products = (
+            models.Product.objects.filter(category__in=categories)
+            .distinct()
+            .exclude(slug=self.kwargs["slug"])
+        )
+        reviews = product.reviews.filter(is_valid=True)[:6]
+        context["related_products"] = related_products
+        context["reviews"] = reviews
+        context["max_reviews"] = 6
+        context["form"] = forms.ReviewForm()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        slug = self.kwargs["slug"]
+        user = self.request.user
+
+        if not user.is_authenticated:
+            return redirect(
+                f"{reverse('accounts:login')}?next={reverse('products:detail',kwargs={'slug':slug})}"
+            )
+
+        product = get_object_or_404(models.Product, slug=slug)
+
+        has_purchased = OrderItem.objects.filter(
+            order__user=user,
+            product=product,
+            order__is_paid=True  
+        ).exists()
+
+        if not has_purchased:
+            return JsonResponse(
+                {"error": "You must purchase this product before leaving a review."},
+                status=403,
+            )
+        form = forms.ReviewForm(request.POST, request=self.request, product=product)
+        if form.is_valid():
+            review = form.save()
+
+            return JsonResponse(
+                {
+                    "response": "ok",
+                    "imageUrl": user.image_file.url,
+                    "message": form.cleaned_data["text"],
+                    "createdAt": review.created_at.strftime("%d %b %Y"),
+                    "name": user.username,
+                },
+                status=200,
+            )
+
+        return JsonResponse({"error": form.errors}, status=400)
