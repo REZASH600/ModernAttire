@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "apps.accounts.apps.AccountsConfig",
     "apps.products.apps.ProductsConfig",
     "apps.contact.apps.ContactConfig",
+    "apps.orders.apps.OrdersConfig",
     # drf
     "rest_framework",
     "django_filters",
