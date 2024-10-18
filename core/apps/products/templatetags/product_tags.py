@@ -26,6 +26,7 @@ def is_like(context, product_id):
     if user.is_authenticated:
         return product.likes.filter(id=user.id).exists()
 
+
     return False
 
 
