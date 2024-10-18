@@ -26,7 +26,7 @@
                 <div class="p-3" style="max-width: 700px;">
                   <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Men Fashion</h1>
                   <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
-                  <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="">Shop Now</a>
+                  <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="{% url 'products:list' %}?gender=M">Shop Now</a>
                 </div>
               </div>
             </div>
@@ -36,7 +36,7 @@
                 <div class="p-3" style="max-width: 700px;">
                   <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Women Fashion</h1>
                   <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
-                  <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="">Shop Now</a>
+                  <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="{% url 'products:list' %}?gender=F">Shop Now</a>
                 </div>
               </div>
             </div>
@@ -46,7 +46,7 @@
                 <div class="p-3" style="max-width: 700px;">
                   <h1 class="display-4 text-white mb-3 animate__animated animate__fadeInDown">Kids Fashion</h1>
                   <p class="mx-md-5 px-5 animate__animated animate__bounceIn">Lorem rebum magna amet lorem magna erat diam stet. Sadips duo stet amet amet ndiam elitr ipsum diam</p>
-                  <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="">Shop Now</a>
+                  <a class="btn btn-outline-light py-2 px-4 mt-3 animate__animated animate__fadeInUp" href="{% url 'products:list' %}?gender=K">Shop Now</a>
                 </div>
               </div>
             </div>
@@ -76,7 +76,7 @@
       <div class="row px-xl-5 pb-3">
         {% for category in categories %}
           <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-            <a class="text-decoration-none" href="">
+            <a class="text-decoration-none" href="{% url 'products:list' %}?category={{category.slug}}">
               <div class="cat-item d-flex align-items-center mb-4">
                 <div class="overflow-hidden" style="width: 100px; height: 100px;">
                   <img class="img-fluid" src="{{ category.image_file.url }}" alt="" />
@@ -97,46 +97,49 @@
   <!-- Product Start -->
   <div class="container-fluid pt-5 pb-3">
     <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Featured Products</span></h2>
-    {% for product in featured_products %}
-    <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-        <div class="product-item bg-light mb-4">
-        <div class="product-img position-relative overflow-hidden">
-            <img class="img-fluid w-100" src="{{product.images.all.first.image_file.url}}" alt="" />
-            <div class="product-action">
-            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-            <a class="btn btn-outline-dark btn-square btn-like" data-product-id="{{product.id}}" href="{% url 'products:like' product.id %}" >
-                {% is_like product.id as liked %}                   
-                {% if liked %}
-                    <i class="fas fa-heart"></i>
-                {% else %}
-                    <i class="far fa-heart"></i> 
-                {% endif %}
-             
-            </a>
-            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-            <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
+    <div class="row px-xl-5">
+      {% for product in featured_products %}
+        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+            <div class="product-item bg-light mb-4">
+            <div class="product-img position-relative overflow-hidden">
+                <img class="img-fluid w-100" src="{{product.images.all.first.image_file.url}}" alt="" />
+                <div class="product-action">
+                <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
+                <a class="btn btn-outline-dark btn-square btn-like" data-product-id="{{product.id}}" href="{% url 'products:like' product.id %}" >
+                    {% is_like product.id as liked %}                   
+                    {% if liked %}
+                        <i class="fas fa-heart"></i>
+                    {% else %}
+                        <i class="far fa-heart"></i> 
+                    {% endif %}
+                 
+                </a>
+                <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
+                <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-search"></i></a>
+                </div>
+            </div>
+            <div class="text-center py-4">
+                <a class="h6 text-decoration-none text-truncate" href="{% url 'products:detail' product.slug %}">{{product.name}}</a>
+                <div class="d-flex align-items-center justify-content-center mt-2">
+                    {% product_offer product as product_offer %}
+                    {% if product_offer %}
+                    <h5>${{ product_offer }}</h5><h6 class="text-muted ml-2"><del>${{product.price}}</del></h6>
+                           
+
+                    {% else %}
+
+                    <h5>${{product.price}}</h5><h6 class="text-muted ml-2"></h6>
+
+                    
+                    {% endif %}
+                </div>
+            </div>
             </div>
         </div>
-        <div class="text-center py-4">
-            <a class="h6 text-decoration-none text-truncate" href="">{{product.name}}</a>
-            <div class="d-flex align-items-center justify-content-center mt-2">
-                {% product_offer product as product_offer %}
-                {% if product_offer %}
-                <h5>${{ product_offer }}</h5><h6 class="text-muted ml-2"><del>${{product.price}}</del></h6>
-                       
-
-                {% else %}
-
-                <h5>${{product.price}}</h5><h6 class="text-muted ml-2"></h6>
-
-                
-                {% endif %}
-            </div>
-        </div>
-        </div>
+      {% endfor %}
+    
     </div>
-  {% endfor %}
-</div>
+  </div>
 <!-- Products End -->
 
 
@@ -151,7 +154,7 @@
             <div class="offer-text">
               <h6 class="text-white text-uppercase">Save {{ offer.discount_percentage }}%</h6>
               <h3 class="text-white mb-3">{{ offer.title }}</h3>
-              <a href="" class="btn btn-primary">Shop Now</a>
+              <a href="{% url 'products:list'%}?offer={{offer.id}}" class="btn btn-primary">Shop Now</a>
             </div>
           </div>
         </div>
@@ -185,7 +188,7 @@
                 </div>
             </div>
             <div class="text-center py-4">
-                <a class="h6 text-decoration-none text-truncate" href="">{{product.name}}</a>
+                <a class="h6 text-decoration-none text-truncate" href="{% url 'products:detail' product.slug %}">{{product.name}}</a>
                 <div class="d-flex align-items-center justify-content-center mt-2">
                     {% product_offer product as product_offer %}
                     {% if product_offer %}
