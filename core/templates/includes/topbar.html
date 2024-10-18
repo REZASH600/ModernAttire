@@ -26,7 +26,13 @@
       <div class="d-inline-flex align-items-center d-block d-lg-none">
         <a href="" class="btn px-0 ml-2">
           <i class="fas fa-heart text-dark"></i>
-          <span class="badge text-dark border border-dark rounded-circle number-like" style="padding-bottom: 2px;">{% if request.user.is_authenticated %}{{request.user.liked_products.all.count}}{%else%}0{% endif %}</span>
+          <span class="badge text-dark border border-dark rounded-circle number-like" style="padding-bottom: 2px;">
+            {% if request.user.is_authenticated %}
+              {{ request.user.liked_products.all.count }}
+            {% else %}
+              0
+            {% endif %}
+          </span>
         </a>
         <a href="" class="btn px-0 ml-2">
           <i class="fas fa-shopping-cart text-dark"></i>
@@ -43,9 +49,9 @@
       </a>
     </div>
     <div class="col-lg-4 col-6 text-left">
-      <form action="">
+      <form action="{% url 'products:list' %}">
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="Search for products" />
+          <input type="text" class="form-control" name="q" placeholder="Search for products" />
           <div class="input-group-append">
             <span class="input-group-text bg-transparent text-primary"><i class="fa fa-search"></i></span>
           </div>

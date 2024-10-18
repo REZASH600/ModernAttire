@@ -18,7 +18,7 @@
                                     </div>
                                 </div>
                             {% else %}
-                             <a href="" class="nav-item nav-link">{{category.name}}</a>
+                             <a href="{% url 'products:list' %}?category={{category.slug}}" class="nav-item nav-link">{{category.name}}</a>
                             {% endif %}
                              
 
@@ -40,6 +40,7 @@
                     <div class="navbar-nav mr-auto py-0">
                         <a href="{% url 'home' %}" class="nav-item nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
                         <a href="shop.html" class="nav-item nav-link">Shop</a>
+                        <a href="shop.html" class="nav-item nav-link {% if request.resolver_match.url_name == 'list' %}active{% endif %}">Shop</a>
                         <a href="detail.html" class="nav-item nav-link">Shop Detail</a>
                         <div class="nav-item dropdown">
                             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages <i class="fa fa-angle-down mt-1"></i></a>
